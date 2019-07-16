@@ -36,6 +36,7 @@ def extract_zipfile(archive):
 
 
 if __name__ == '__main__':
-    r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
-    extract_zipfile(r)
-
+    # r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
+    # extract_zipfile(r)
+    with open('downloads/1vs1200.txt', 'r', encoding='koi8-r') as f:
+        data = f.read()
