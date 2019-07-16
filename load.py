@@ -1,8 +1,8 @@
-import requests
-import shutil
 import logging
 import zipfile
+import urllib.request
 
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -12,16 +12,23 @@ logging.basicConfig(
 )
 
 
+# https://stackoverflow.com/a/53877507
+class DownloadProgressBar(tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
+
+
 def download_file(url):
-    local_filename = url.split('/')[-1]
+    output_path = url.split('/')[-1]
     try:
-        with requests.get(url, stream=True) as response:
-            response.raise_for_status()
-            with open(local_filename, 'wb') as f:
-                shutil.copyfileobj(response.raw, f)
-        return local_filename
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, desc=output_path) as t:
+            urllib.request.urlretrieve(url, filename=output_path, reporthook=t.update_to)
+        return output_path
     except Exception as e:
         logger.error(e)
+
 
 def extract_zipfile(archive):
     with zipfile.ZipFile(archive, "r") as zip_ref:
@@ -29,6 +36,6 @@ def extract_zipfile(archive):
 
 
 if __name__ == '__main__':
-    # r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
-    extract_zipfile("quiz-questions.zip")
+    r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
+    extract_zipfile(r)
 
