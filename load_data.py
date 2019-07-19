@@ -1,4 +1,5 @@
 import logging
+import json
 import zipfile
 import urllib.request
 import re
@@ -52,10 +53,14 @@ def list_files(folder):
 def add_data_to_dict(title, matches, quiz_dict):
     quiz_dict[title] = list()
     for match in matches:
-        quiz_dict[title].append({
-            "Вопрос": match[1],
-            "Ответ": match[3]
-        })
+        if not match[1].startswith("(pic") and match[1].find("<раздатка>") == -1:
+            question = match[1]
+            answer_short = match[3].split(".")[0]
+            answer_desc = ".".join(match[3].split(".")[1:])
+            quiz_dict[title].append({
+                "Вопрос": question,
+                "Ответ": [answer_short, answer_desc]
+            })
     return quiz_dict
 
 
@@ -73,7 +78,8 @@ def generate_dict():
 
 
 if __name__ == '__main__':
-    # r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
-    # extract_zipfile(r)
+    r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
+    extract_zipfile(r)
     quiz_dict = generate_dict()
-
+    with open('dict.json', 'w', encoding='utf-8') as json_file:
+        json.dump(quiz_dict, json_file, indent=2, ensure_ascii=False)
