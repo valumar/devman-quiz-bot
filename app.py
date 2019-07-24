@@ -45,10 +45,13 @@ def compare(answer, ethalon):
     normalized_answer = normalize(answer)
     normalized_ethalon = normalize(ethalon)
     p = normalized_ethalon - normalized_answer
+
     result = False
     if len(p) <= .5 * len(normalized_ethalon):
         result = True
     return result
+
+# TODO: Обрапотка очпяток и громотищеских ошипок
 
 
 def start(bot, update):
@@ -59,13 +62,7 @@ def start(bot, update):
                        ['Мой счет']]
 
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True)
-    # chat_id = bot.get_updates()[-1].message.chat_id
-    update.message.reply_text(text="I'm back.", reply_markup=reply_markup)
-
-
-def help(bot, update):
-    """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text(text="...", reply_markup=reply_markup)
 
 
 def echo(bot, update):
@@ -91,6 +88,8 @@ def echo(bot, update):
         update.message.reply_text(question)
     elif update.message.text == 'Сдаться':
         update.message.reply_text('Вы сдались')
+        update.message.reply_text(f'Правильный ответ: \n{answer}')
+        update.message.reply_text(desc)
     elif update.message.text == 'Мой счет':
         update.message.reply_text('Ваш счет: ')
     elif compare(update.message.text, answer):

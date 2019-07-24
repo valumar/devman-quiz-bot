@@ -82,4 +82,4 @@ if __name__ == '__main__':
     extract_zipfile(r)
     quiz_dict = generate_dict()
     with open('dict.json', 'w', encoding='utf-8') as json_file:
-        json.dump(quiz_dict, json_file, indent=2, ensure_ascii=False)
+        json.dump(quiz_dict, json_file, ensure_ascii=False)
