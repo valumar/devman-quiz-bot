@@ -2,7 +2,11 @@ import json
 import random
 import logging
 import os
+import redis
+import pymorphy2
+import telegram
 
+from string import punctuation
 from dotenv import load_dotenv
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -26,9 +30,37 @@ def get_random_question(data):
     return random_question
 
 
+def normalize(sentence):
+    morph = pymorphy2.MorphAnalyzer()
+    for character in punctuation:
+        sentence = sentence.replace(character, " ")
+    sentence = sentence.split()
+    normalized_sentence = []
+    for word in sentence:
+        normalized_sentence.append(morph.parse(word)[0].normal_form)
+    return set(normalized_sentence)
+
+
+def compare(answer, ethalon):
+    normalized_answer = normalize(answer)
+    normalized_ethalon = normalize(ethalon)
+    p = normalized_ethalon - normalized_answer
+    result = False
+    if len(p) <= .5 * len(normalized_ethalon):
+        result = True
+    return result
+
+
 def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
+
+    custom_keyboard = [['Новый вопрос', 'Сдаться'],
+                       ['Мой счет']]
+
+    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True)
+    # chat_id = bot.get_updates()[-1].message.chat_id
+    update.message.reply_text(text="I'm back.", reply_markup=reply_markup)
 
 
 def help(bot, update):
@@ -38,7 +70,35 @@ def help(bot, update):
 
 def echo(bot, update):
     """Echo the user message."""
-    update.message.reply_text(update.message.text)
+    chat_id = update.message.chat_id
+    custom_keyboard = [['Новый вопрос', 'Сдаться'],
+                       ['Мой счет']]
+    answer, desc = '', ''
+    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+    # update.message.reply_text(text='.', reply_markup=reply_markup)
+    if r.get(chat_id):
+        quest = json.loads(r.get(chat_id))
+        answer = quest['Ответ'][0]
+        desc = quest['Ответ'][1]
+    if update.message.text == 'Новый вопрос':
+        update.message.reply_text('Отправляем новый вопрос')
+        quest = get_random_question(data)
+        question = quest['Вопрос']
+        answer = quest['Ответ'][0]
+        desc = quest['Ответ'][1]
+        r.set(chat_id, json.dumps(quest))
+        print(question, answer, chat_id)
+        update.message.reply_text(question)
+    elif update.message.text == 'Сдаться':
+        update.message.reply_text('Вы сдались')
+    elif update.message.text == 'Мой счет':
+        update.message.reply_text('Ваш счет: ')
+    elif compare(update.message.text, answer):
+        update.message.reply_text('Похоже на правду!')
+        update.message.reply_text(f'Правильный ответ: \n{answer}')
+        update.message.reply_text(desc)
+    else:
+        update.message.reply_text(update.message.text)
 
 
 def error(bot, update, error):
@@ -46,7 +106,7 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-def start_bot(token):
+def start_bot(token, data):
     """Start the bot."""
     # Create the EventHandler and pass it your bot's token.
     updater = Updater(token)
@@ -56,7 +116,7 @@ def start_bot(token):
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
+    # dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
@@ -76,6 +136,7 @@ def start_bot(token):
 if __name__ == '__main__':
     load_dotenv()
     bot_token = os.getenv("TELEGRAM_TOKEN")
-    # data = load_data()
-    start_bot(bot_token)
-    # question = get_random_question(data)
+    r = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), db=0)
+    data = load_data('dict.json')
+    start_bot(bot_token, data)
+
