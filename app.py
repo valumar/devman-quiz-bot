@@ -5,6 +5,7 @@ import os
 import redis
 import pymorphy2
 import telegram
+import requests
 
 from string import punctuation
 from dotenv import load_dotenv
@@ -54,6 +55,19 @@ def compare(answer, ethalon):
 # TODO: Обрапотка очпяток и громотищеских ошипок
 
 
+def spellcheck(sentence):
+    url = "https://speller.yandex.net/services/spellservice.json/checkTexts"
+    payload = {
+        "text": sentence
+    }
+    response = requests.get(url, params=payload)
+    if response.ok:
+        checked_sentence = " ".join(i['s'][0] for i in response.json()[0])
+        return checked_sentence
+    else:
+        return sentence
+
+
 def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
@@ -92,7 +106,7 @@ def echo(bot, update):
         update.message.reply_text(desc)
     elif update.message.text == 'Мой счет':
         update.message.reply_text('Ваш счет: ')
-    elif compare(update.message.text, answer):
+    elif compare(spellcheck(update.message.text), answer):
         update.message.reply_text('Похоже на правду!')
         update.message.reply_text(f'Правильный ответ: \n{answer}')
         update.message.reply_text(desc)
