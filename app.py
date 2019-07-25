@@ -52,8 +52,6 @@ def compare(answer, ethalon):
         result = True
     return result
 
-# TODO: Обрапотка очпяток и громотищеских ошипок
-
 
 def spellcheck(sentence):
     url = "https://speller.yandex.net/services/spellservice.json/checkTexts"
@@ -109,6 +107,7 @@ def echo(bot, update):
     elif compare(spellcheck(update.message.text), answer):
         update.message.reply_text('Похоже на правду!')
         update.message.reply_text(f'Правильный ответ: \n{answer}')
+
         update.message.reply_text(desc)
     else:
         update.message.reply_text(update.message.text)
