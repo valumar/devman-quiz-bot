@@ -88,7 +88,15 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
+def init_user_data(bot, update, user_data):
+    chat_id = update.message.chat_id
+    if r.get(chat_id):
+        user_data = json.loads(r.get(chat_id))
+    return user_data
+
+
 def handle_new_question_request(bot, update, user_data):
+    user_data = init_user_data(bot, update, user_data)
     user_data['chat_id'] = update.message.chat_id
     update.message.reply_text('Отправляем новый вопрос')
     user_data['quest'] = get_random_question(data)
@@ -107,10 +115,10 @@ def handle_new_question_request(bot, update, user_data):
 
 def handle_solution_attempt(bot, update, user_data):
     text = update.message.text
-    update.message.reply_text(text)
+    user_data = init_user_data(bot, update, user_data)
     chat_id = user_data['chat_id']
     if r.get(chat_id):
-        quest = json.loads(r.get(chat_id))['quest']
+        quest = user_data['quest']
         answer = quest['Ответ'][0]
         desc = quest['Ответ'][1]
         if 'score' in user_data:
@@ -132,7 +140,9 @@ def handle_solution_attempt(bot, update, user_data):
 
 # Сдаться
 def giveup(bot, update, user_data):
-    quest = user_data['quest']
+    user_data['chat_id'] = update.message.chat_id
+    chat_id = user_data['chat_id']
+    quest = json.loads(r.get(chat_id))['quest']
     answer = quest['Ответ'][0]
     desc = quest['Ответ'][1]
     update.message.reply_text('Вы сдались')
@@ -144,6 +154,7 @@ def giveup(bot, update, user_data):
 
 # Мой счет
 def score(bot, update, user_data):
+    user_data =init_user_data(bot, update, user_data)
     if 'score' in user_data:
         score = user_data['score']
     else:
@@ -169,7 +180,10 @@ def start_bot(token, data):
                                    pass_user_data=True
                                    ),
                       RegexHandler('^Сдаться$', giveup, pass_user_data=True),
-                      RegexHandler('^Мой счет$', score, pass_user_data=True)
+                      RegexHandler('^Мой счет$', score, pass_user_data=True),
+                      MessageHandler(Filters.text,
+                                     handle_solution_attempt,
+                                     pass_user_data=True),
                       ],
 
         states={
