@@ -52,12 +52,12 @@ def normalize(sentence):
     return set(normalized_sentence)
 
 
-def compare(answer, ethalon):
+def compare(answer, reference):
     normalized_answer = normalize(answer)
-    normalized_ethalon = normalize(ethalon)
-    p = normalized_ethalon - normalized_answer
+    normalized_reference = normalize(reference)
+    difference = normalized_reference - normalized_answer
     result = False
-    if len(p) <= .5 * len(normalized_ethalon):
+    if len(difference) <= .5 * len(normalized_reference):
         result = True
     return result
 
@@ -126,9 +126,7 @@ def handle_solution_attempt(bot, update, user_data):
         else:
             score = 0
         if compare(spellcheck(text), answer):
-            update.message.reply_text('Похоже на правду!')
-            update.message.reply_text(f'Правильный ответ: \n{answer}')
-            update.message.reply_text(desc, reply_markup=markup)
+            update.message.reply_text(f'Похоже на правду! \nПравильный ответ: \n{answer} \n{desc}', reply_markup=markup)
             score += 1
             user_data['score'] = score
             r.set(chat_id, json.dumps(user_data))
@@ -145,9 +143,7 @@ def giveup(bot, update, user_data):
     quest = json.loads(r.get(chat_id))['quest']
     answer = quest['Ответ'][0]
     desc = quest['Ответ'][1]
-    update.message.reply_text('Вы сдались')
-    update.message.reply_text(f'Правильный ответ: \n{answer}')
-    update.message.reply_text(desc, reply_markup=markup)
+    update.message.reply_text(f'Вы сдались \nПравильный ответ: \n{answer} \n{desc}', reply_markup=markup)
 
     return CHOOSING
 
