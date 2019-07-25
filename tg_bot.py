@@ -162,12 +162,14 @@ def score(bot, update, user_data):
 
 def start_bot(token, data):
     # Create the Updater and pass it your bot's token.
-    updater = Updater(token)
+    updater = Updater(
+        token,
+        request_kwargs={'proxy_url': os.getenv('TELEGRAM_HTTPS_PROXY')}
+    )
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start),
                       # в случае перезагрузки бота продолжаем диалог
