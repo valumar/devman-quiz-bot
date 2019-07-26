@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 Помимо этого Вам необходим доступ к серверу Redis
 
-#### Настройики Бота Викторины Что?Где?Когда? для Telegram и VK Groups
+#### Настройики Бота Викторины Что?Где?Когда? для Telegram
 Вам необходимо зарегистрировать Telegram Bot через [@BotFather] (https://telegram.me/botfather) и получить TELEGRAM_TOKEN и TELEGRAM_CHAT_ID (для этого используйте [@userinfobot] (https://telegram.me/userinfobot))
 После этого скопируйте файл `.env-example` в` .env` и вставьте вашу информацию в поля:
 ```dotenv
@@ -36,7 +36,7 @@ TELEGRAM_TOKEN=
 ```
 
 #### Настройики Бота Викторины Что?Где?Когда? для VK Groups
-Для правильного использования вы должны получить учетную запись ВКонтакте. Вам необходимо создать [VK Group] (https://vk.com/groups_create) и создать ключ API для группы в настройках группы (`https: //vk.com/your_group? Act = tokens`)
+Для правильного использования вы должны получить учетную запись ВКонтакте. Вам необходимо создать [VK Group] (https://vk.com/groups_create) и создать ключ API для группы в настройках группы (`https://vk.com/your_group?Act=tokens`)
 Вставьте свою информацию в `.env`:
 ```dotenv
 VK__TOKEN=your_vk_group_token
