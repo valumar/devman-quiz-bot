@@ -48,6 +48,7 @@ def handle_new_question_request(bot, update, user_data):
     user_data = init_user_data(bot, update, user_data)
     user_data['chat_id'] = update.message.chat_id
     update.message.reply_text('Отправляем новый вопрос')
+    data = load_data('dict.json')
     user_data['quest'] = get_random_question(data)
     question = user_data['quest']['Вопрос']
     championat = user_data['quest']['Чампионат']
@@ -109,7 +110,7 @@ def score(bot, update, user_data):
     return CHOOSING
 
 
-def start_bot(token, data):
+def start_bot(token):
     # Create the Updater and pass it your bot's token.
     updater = Updater(
         token,
@@ -174,5 +175,4 @@ if __name__ == '__main__':
     load_dotenv()
     bot_token = os.getenv("TELEGRAM_TOKEN")
     r = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), db=0)
-    data = load_data('dict.json')
-    start_bot(bot_token, data)
+    start_bot(bot_token)
