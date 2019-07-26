@@ -84,6 +84,8 @@ def handle_solution_attempt(bot, update, user_data):
         else:
             update.message.reply_text('Неверно! Хотите сдаться или попробовать ответить ещё раз?', reply_markup=markup)
             return TYPING_REPLY
+    else:
+        return CHOOSING
 
 
 # Сдаться
