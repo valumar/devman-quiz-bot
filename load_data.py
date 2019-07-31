@@ -1,6 +1,7 @@
 import logging
 import json
 import zipfile
+import urllib.error
 import urllib.request
 import re
 import os
@@ -23,8 +24,13 @@ def download_file(url):
         with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, desc=output_path) as t:
             urllib.request.urlretrieve(url, filename=output_path, reporthook=t.update_to)
         return output_path
+    except urllib.error.HTTPError as e:
+        logger.error(f"HTTPError: {e}")
+    except urllib.error.URLError as e:
+        logger.error(f"URLError: {e}")
     except Exception as e:
-        logger.error(e)
+        logger.error(f"Generic Error: {e}")
+
 
 
 def extract_zipfile(archive):
