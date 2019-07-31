@@ -40,8 +40,11 @@ def extract_zipfile(archive):
 
 def match_data(data):
     # https://regex101.com/r/UxmySB/2
-    regex = r"(Вопрос \d+:\n)(.*(?:\n(?!Ответ:$).*)*)\n+(Ответ:$)\n(.*(?:\n(?!Вопрос \d+:\n)|(?!Тур:\n).*)*)\n+"
-    matches = re.findall(regex, data, re.MULTILINE)
+    regex = r"""(Вопрос\s\d+:\n)                                    # Первый якорь: строка начинающаяся на `Вопрос`
+                (.*(?:\n(?!Ответ:$).*)*)\n+                         # Извлекаем текст до якоря `Ответ:`
+                (Ответ:$)                                           # Якорь `Ответ:` 
+                \n(.*(?:\n(?!Вопрос\s\d+:\n)|(?!Тур:\n).*)*)\n+"""  # Извлекаем комментарии к ответу
+    matches = re.findall(regex, data, re.VERBOSE | re.MULTILINE)
     return matches
 
 
@@ -83,8 +86,8 @@ if __name__ == '__main__':
         level=logging.INFO,
         # filename='log.log'
     )
-    r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
-    extract_zipfile(r)
+    # r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
+    # extract_zipfile(r)
     quiz_dict = generate_dict()
     with open('dict.json', 'w', encoding='utf-8') as json_file:
         json.dump(quiz_dict, json_file, ensure_ascii=False)
