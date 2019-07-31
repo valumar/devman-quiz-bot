@@ -8,12 +8,6 @@ import os
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO,
-    # filename='log.log'
-)
-
 
 # https://stackoverflow.com/a/53877507
 class DownloadProgressBar(tqdm):
@@ -78,6 +72,11 @@ def generate_dict():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO,
+        # filename='log.log'
+    )
     r = download_file("http://dvmn.org/media/modules_dist/quiz-questions.zip")
     extract_zipfile(r)
     quiz_dict = generate_dict()

@@ -10,10 +10,6 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 from text_utils import load_data, get_random_question, spellcheck, compare
 
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
 logger = logging.getLogger(__name__)
 
 CHOOSING, TYPING_REPLY = range(2)
@@ -175,6 +171,8 @@ def start_bot(token):
 
 if __name__ == '__main__':
     load_dotenv()
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
     bot_token = os.getenv("TELEGRAM_TOKEN")
     r = redis.Redis(host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), db=0)
     start_bot(bot_token)
