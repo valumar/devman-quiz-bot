@@ -9,7 +9,7 @@ from vk_api.utils import get_random_id
 import redis
 
 from dotenv import load_dotenv
-from text_utils import load_data, get_random_question, spellcheck, compare
+from text_utils import load_data, get_random_question, check_spelling, compare
 
 
 def init_keyboard():
@@ -41,7 +41,7 @@ def send_message(event, vk_api, message):
     )
 
 
-def new_question(event, vk_api):
+def send_new_question(event, vk_api):
     data = load_data('dict.json')
     user_data = init_user_data(event.user_id)
     quest = get_random_question(data)
@@ -60,14 +60,14 @@ def check_answer(event, vk_api):
         quest = user_data['quest']
         answer = quest['Ответ'][0]
         desc = quest['Ответ'][1]
-        if 'score' in user_data:
-            score = user_data['score']
+        if 'send_score' in user_data:
+            score = user_data['send_score']
         else:
             score = 0
-        if compare(spellcheck(event.text), answer):
+        if compare(check_spelling(event.text), answer):
             message = f'Похоже на правду!\nПравильный ответ: \n{answer}\n{desc}'
             score += 1
-            user_data['score'] = score
+            user_data['send_score'] = score
             r.set(event.user_id, json.dumps(user_data))
         else:
             message = 'Неверно! Хотите сдаться или попробовать ответить ещё раз?'
@@ -88,10 +88,10 @@ def givup(event, vk_api):
     send_message(event, vk_api, message)
 
 
-def score(event, vk_api):
+def send_score(event, vk_api):
     user_data = init_user_data(event.user_id)
-    if 'score' in user_data:
-        score = user_data['score']
+    if 'send_score' in user_data:
+        score = user_data['send_score']
     else:
         score = 0
     message = f'ваш счёт: {score}'
@@ -109,11 +109,11 @@ if __name__ == "__main__":
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             if event.text == "Новый вопрос":
-                new_question(event, vk_api)
+                send_new_question(event, vk_api)
             elif event.text == "Сдаться":
                 givup(event, vk_api)
             elif event.text == "Мой счёт":
-                score(event, vk_api)
+                send_score(event, vk_api)
             else:
                 check_answer(event, vk_api)
 

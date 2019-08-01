@@ -8,7 +8,7 @@ from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
 
-from text_utils import load_data, get_random_question, spellcheck, compare
+from text_utils import load_data, get_random_question, check_spelling, compare
 
 logger = logging.getLogger(__name__)
 
@@ -67,14 +67,14 @@ def handle_solution_attempt(bot, update, user_data):
         quest = user_data['quest']
         answer = quest['Ответ'][0]
         desc = quest['Ответ'][1]
-        if 'score' in user_data:
-            score = user_data['score']
+        if 'send_score' in user_data:
+            score = user_data['send_score']
         else:
             score = 0
-        if compare(spellcheck(text), answer):
+        if compare(check_spelling(text), answer):
             update.message.reply_text(f'Похоже на правду! \nПравильный ответ: \n{answer} \n{desc}', reply_markup=markup)
             score += 1
-            user_data['score'] = score
+            user_data['send_score'] = score
             r.set(chat_id, json.dumps(user_data))
             return CHOOSING
         else:
@@ -97,10 +97,10 @@ def giveup(bot, update, user_data):
 
 
 # Мой счет
-def score(bot, update, user_data):
+def send_score(bot, update, user_data):
     user_data =init_user_data(bot, update, user_data)
-    if 'score' in user_data:
-        score = user_data['score']
+    if 'send_score' in user_data:
+        score = user_data['send_score']
     else:
         score = 0
     update.message.reply_text(f'Ваш счет: {score}', reply_markup=markup)
@@ -126,7 +126,7 @@ def start_bot(token):
                                    pass_user_data=True
                                    ),
                       RegexHandler('^Сдаться$', giveup, pass_user_data=True),
-                      RegexHandler('^Мой счет$', score, pass_user_data=True),
+                      RegexHandler('^Мой счет$', send_score, pass_user_data=True),
                       MessageHandler(Filters.text,
                                      handle_solution_attempt,
                                      pass_user_data=True),
@@ -138,12 +138,12 @@ def start_bot(token):
                                     pass_user_data=True
                                     ),
                        RegexHandler('^Сдаться$', giveup, pass_user_data=True),
-                       RegexHandler('^Мой счет$', score, pass_user_data=True)
+                       RegexHandler('^Мой счет$', send_score, pass_user_data=True)
                        ],
 
 
             TYPING_REPLY: [RegexHandler('^Сдаться$', giveup, pass_user_data=True),
-                           RegexHandler('^Мой счет$', score, pass_user_data=True),
+                           RegexHandler('^Мой счет$', send_score, pass_user_data=True),
                            MessageHandler(Filters.text,
                                           handle_solution_attempt,
                                           pass_user_data=True),
@@ -151,7 +151,7 @@ def start_bot(token):
         },
 
         fallbacks=[RegexHandler('^Сдаться$', giveup, pass_user_data=True),
-                   RegexHandler('^Мой счет$', score, pass_user_data=True)
+                   RegexHandler('^Мой счет$', send_score, pass_user_data=True)
                    ]
     )
 

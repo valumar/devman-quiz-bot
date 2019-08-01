@@ -45,7 +45,7 @@ def compare(answer, reference):
     return result
 
 
-def spellcheck(sentence):
+def check_spelling(sentence):
     url = "https://speller.yandex.net/services/spellservice.json/checkTexts"
     payload = {
         "text": sentence
