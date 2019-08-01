@@ -84,8 +84,8 @@ def handle_solution_attempt(bot, update, user_data):
         return CHOOSING
 
 
-# Сдаться
 def giveup(bot, update, user_data):
+    """Return the answer for question and then return user to main menu"""
     user_data['chat_id'] = update.message.chat_id
     chat_id = user_data['chat_id']
     quest = json.loads(r.get(chat_id))['quest']
@@ -96,8 +96,8 @@ def giveup(bot, update, user_data):
     return CHOOSING
 
 
-# Мой счет
 def send_score(bot, update, user_data):
+    """Return user score and then return user to main menu"""
     user_data =init_user_data(bot, update, user_data)
     if 'send_score' in user_data:
         score = user_data['send_score']
