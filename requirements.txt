@@ -5,3 +5,4 @@ redis==3.2.1
 pymorphy2==0.8
 pymorphy2-dicts-ru
 vk-api==11.5.0
+pytest==5.0.1
