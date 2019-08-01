@@ -47,7 +47,7 @@ def handle_new_question_request(bot, update, user_data):
     data = load_data('dict.json')
     user_data['quest'] = get_random_question(data)
     question = user_data['quest']['Вопрос']
-    championat = user_data['quest']['Чампионат']
+    championat = user_data['quest']['Чемпионат']
     answer = user_data['quest']['Ответ'][0]
     desc = user_data['quest']['Ответ'][1]
 

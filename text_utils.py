@@ -19,7 +19,7 @@ def load_data(json_file):
 def get_random_question(data):
     random_champ = random.choice(list(data.keys()))
     random_question = random.choice(data[random_champ])
-    random_question['Чампионат'] = random_champ
+    random_question['Чемпионат'] = random_champ
     logger.info(f"get_random_question - {random_champ} {random_question}")
     return random_question
 
