@@ -1,7 +1,7 @@
 requests==2.22.0
 tqdm==4.32.2
 python-telegram-bot==11.1.0
-redis==3.2.1
+redis==4.5.3
 pymorphy2==0.8
 pymorphy2-dicts-ru
 vk-api==11.5.0
