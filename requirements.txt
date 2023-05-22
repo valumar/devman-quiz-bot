@@ -1,4 +1,4 @@
-requests==2.22.0
+requests==2.31.0
 tqdm==4.32.2
 python-telegram-bot==11.1.0
 redis==3.2.1
